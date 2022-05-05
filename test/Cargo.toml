@@ -1,0 +1,17 @@
+[package]
+name = "test"
+version = "0.0.0"
+authors = ["Fuel Labs <contact@fuel.sh>"]
+edition = "2021"
+publish = false
+
+[dependencies]
+anyhow = "1.0.41"
+forc = { version = "0.12.0", path = "../forc", features = ["test"], default-features = false }
+fuel-asm = "0.4"
+fuel-tx = "0.9"
+fuel-vm = { version = "0.8", features = ["random"] }
+rand = "0.8"
+regex = "1"
+serde_json = "1.0.73"
+tokio = "1.12"

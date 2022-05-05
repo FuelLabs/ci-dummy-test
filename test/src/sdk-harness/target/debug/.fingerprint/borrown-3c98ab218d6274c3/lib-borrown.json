@@ -1,0 +1,1 @@
+{"rustc":13687497161850774852,"features":"[]","target":10903067630353799554,"profile":8344124108420085910,"path":15588051470048819754,"deps":[],"local":[{"CheckDepInfo":{"dep_info":"debug/.fingerprint/borrown-3c98ab218d6274c3/dep-lib-borrown"}}],"rustflags":["-C","link-arg=-fuse-ld=/usr/local/bin/zld"],"metadata":258014636234968290,"config":2202906307356721367,"compile_kind":0}

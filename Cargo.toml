@@ -1,0 +1,29 @@
+[workspace]
+resolver = "2"
+members = [
+    "docstrings",
+    "forc",
+    "forc-explore",
+    "forc-fmt",
+    "forc-gm",
+    "forc-lsp",
+    "forc-pkg",
+    "forc-util",
+    "scripts/examples-checker",
+    "scripts/forc-documenter",
+    "sway-core",
+    "sway-fmt",
+    "sway-ir",
+    "sway-lsp",
+    "sway-parse",
+    "sway-types",
+    "sway-utils",
+    "test",
+    "test-sig-gen-util",
+]
+exclude = [
+    "examples/*"
+]
+
+[profile.dev.package.sway-lsp]
+debug = 2

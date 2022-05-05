@@ -1,0 +1,12 @@
+[book]
+authors = ["Fuel Labs <contact@fuel.sh>"]
+language = "en"
+multilingual = false
+src = "src"
+title = "The Sway Programming Language"
+
+[output.html]
+git-repository-url = "https://github.com/FuelLabs/sway"
+
+[rust]
+edition = "2021"
