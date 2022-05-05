@@ -1,0 +1,184 @@
+name: Trigger Release
+
+# on:
+#   pull_request:
+#     branches:
+#       - master
+#     types: [closed]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+  release:
+    types: [published]
+
+env:
+  CARGO_TERM_COLOR: always
+  REGISTRY: ghcr.io
+
+jobs:
+  cancel-previous-runs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.9.1
+        with:
+          access_token: ${{ github.token }}
+
+  trigger-new-release:
+    # if: ${{ github.event.pull_request.merged }}
+    runs-on: ubuntu-latest
+    needs: cancel-previous-runs
+    steps:
+      - uses: actions/checkout@v2
+      - name: Trigger Release
+        run: |
+          git fetch
+          git ls-remote --tags
+          LATEST_TAG=$(git ls-remote --tags | tail -n 1 | awk '{ print $2 }' | awk -F'/' '{ print $3 }')
+          MASTER_VERSION=$(cat forc/Cargo.toml | grep version | head -n 1 | awk '{ print $3 }' | xargs)
+
+          # We can insert whatever $VERSION_DID_CHANGE logic that we want. This logic
+          # just looks through all manifest versions to see if (1) all manifest versions are
+          # the same, and (2) if the version on master is different that the latest tag 
+          if [ $LATEST_TAG == $MASTER_VERSION ]; then
+            echo "No new release"
+          else
+            # TODO: Finish
+            echo "TRIGGER_RELEASE_FOR=v${MASTER_VERSION}" >> $GITHUB_ENV
+          fi
+
+    outputs:
+      trigger_release_for: ${{ env.TRIGGER_RELEASE_FOR }}
+
+  create-and-tag-release:
+    runs-on: ubuntu-latest
+    needs: [
+      cancel-previous-runs,
+      trigger-new-release,
+    ]
+    steps:
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{needs.trigger-new-release.outputs.trigger_release_for}}
+          release_name: ${{needs.trigger-new-release.outputs.trigger_release_for}}
+          draft: false
+          prerelease: false
+
+      - name: Save Asset(s) Upload URL
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ASSET_UPLOAD_URL=${{ steps.create_release.outputs.upload_url }}
+          echo "ASSET_UPLOAD_URL=$ASSET_UPLOAD_URL" >> $GITHUB_ENV
+    outputs:
+      asset_upload_url: ${{ env.ASSET_UPLOAD_URL }}
+
+  build-and-publish-forc-binary:
+    name: Forc Binary - ${{ matrix.job.target }} (${{ matrix.job.os }})
+    runs-on: ${{ matrix.job.os }}
+    needs: [
+      cancel-previous-runs,
+      create-and-tag-release,
+    ]
+    strategy:
+      matrix:
+        job:
+          - os: ubuntu-latest
+            platform: linux
+            target: x86_64-unknown-linux-gnu
+            arch: amd64
+            svm_target_platform: linux-amd64
+          - os: ubuntu-latest
+            platform: linux
+            target: aarch64-unknown-linux-gnu
+            arch: arm64
+            svm_target_platform: linux-aarch64
+          - os: macos-latest
+            platform: darwin
+            target: x86_64-apple-darwin
+            arch: amd64
+            svm_target_platform: macosx-amd64
+          - os: macos-latest
+            platform: darwin
+            target: aarch64-apple-darwin
+            arch: arm64
+          #   svm_target_platform: macosx-aarch64
+          # - os: windows-latest
+          #   platform: win32
+          #   target: x86_64-pc-windows-msvc
+          #   arch: amd64
+          #   svm_target_platform: macosx-amd64
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Install toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          target: ${{ matrix.job.target }}
+          override: true
+
+      - uses: Swatinem/rust-cache@v1
+        with:
+          cache-on-failure: true
+
+      - name: Apple M1 setup
+        if: ${{ matrix.job.target == 'aarch64-apple-darwin' }}
+        run: |
+          echo "SDKROOT=$(xcrun -sdk macosx --show-sdk-path)" >> $GITHUB_ENV
+          echo "MACOSX_DEPLOYMENT_TARGET=$(xcrun -sdk macosx --show-sdk-platform-version)" >> $GITHUB_ENV
+
+      - name: Linux ARM setup
+        if: ${{ matrix.job.target == 'aarch64-unknown-linux-gnu' }}
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y gcc-aarch64-linux-gnu
+          echo "CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc" >> $GITHUB_ENV
+
+      - name: Install Forc
+        uses: actions-rs/cargo@v1
+        with:
+          command: install
+          args: --debug --path ./forc
+
+      - name: Prep Assets
+        id: prep_assets
+        env:
+          PLATFORM_NAME: ${{ matrix.job.platform }}
+          TARGET: ${{ matrix.job.target }}
+          ARCH: ${{ matrix.job.arch }}
+        run: |
+          ZIP_FILE_NAME=forc_${{ env.PLATFORM_NAME }}_${{ env.ARCH }}.gz
+
+          if [ "${{ env.PLATFORM_NAME }}" == "linux" ]; then
+            echo "ZIP_FILE_NAME=$ZIP_FILE_NAME" >> $GITHUB_ENV
+            gzip -c $(which forc) > ./$ZIP_FILE_NAME
+          elif [ "${{ env.PLATFORM_NAME }}" == "darwin" ]; then
+            echo "ZIP_FILE_NAME=$ZIP_FILE_NAME" >> $GITHUB_ENV
+            gzip -c $(which forc) > ./$ZIP_FILE_NAME
+          else
+            # TODO: Fix
+            ZIP_FILE_NAME=forc_${{ env.PLATFORM_NAME }}_${{ env.ARCH }}.zip
+            echo "ZIP_FILE_NAME=$ZIP_FILE_NAME" >> $GITHUB_ENV
+            cd ./forcbin/out/debug
+            7z a -tzip $ZIP_FILE_NAME
+            mv ${{ env.ZIP_FILE_NAME }} ../../../
+          fi
+
+      - name: Archive binaries
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ needs.create-and-tag-release.outputs.asset_upload_url }}
+          asset_path: ./${{ env.ZIP_FILE_NAME }}
+          asset_name: ${{ env.ZIP_FILE_NAME }}
+          asset_content_type: application/gzip
