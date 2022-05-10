@@ -451,11 +451,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Install toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
+      # - name: Install toolchain
+      #   uses: actions-rs/toolchain@v1
+      #   with:
+      #     toolchain: stable
+      #     override: true
 
       # - name: Verify tag version
       #   run: |
@@ -490,8 +490,8 @@ jobs:
       #     notify_when: 'failure'
       #   env:
       #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_NOTIFY_BUILD }}
-    outputs:
-      release_upload_url: ${{ github.event.release.upload_url }}
+    # outputs:
+    #   release_upload_url: ${{ github.event.release.upload_url }}
 
   # build-publish-master-image:
   #   needs:
@@ -724,7 +724,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
-          upload_url: ${{ needs.pusblish.outputs.release_upload_url }}
+          upload_url: ${{ github.event.release.upload_url }}
           asset_path: ./${{ env.ZIP_FILE_NAME }}
           asset_name: ${{ env.ZIP_FILE_NAME }}
           asset_content_type: application/gzip
