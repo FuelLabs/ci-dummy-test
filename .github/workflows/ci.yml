@@ -725,7 +725,7 @@ jobs:
           RELEASE_URL: ${{ github.event.release.upload_url }}
           GITHUB_TOKEN: ${{ github.token }}
         with:
-          upload_url: github.event.release.upload_url
+          upload_url: 'foobarzoo.com'
           # upload_url: ${{ github.event.release.upload_url }}
           asset_path: ./${{ env.ZIP_FILE_NAME }}
           asset_name: ${{ env.ZIP_FILE_NAME }}
