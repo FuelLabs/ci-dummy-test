@@ -533,7 +533,7 @@ jobs:
           footer: ''
           notify_when: 'failure'
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.ACTION_MONITORING_SLACK }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_NOTIFY_BUILD }}
 
   publish:
     # Only do this job if publishing a release
@@ -596,7 +596,7 @@ jobs:
           footer: ''
           notify_when: 'failure'
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.ACTION_MONITORING_SLACK }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_NOTIFY_BUILD }}
 
   build-publish-master-image:
     needs:
@@ -668,7 +668,7 @@ jobs:
           footer: ''
           notify_when: 'failure'
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.ACTION_MONITORING_SLACK }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_NOTIFY_BUILD }}
 
   build-publish-release-image:
     # Build & Publish Docker Image Per Sway Release
@@ -723,4 +723,4 @@ jobs:
           footer: ''
           notify_when: 'failure'
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.ACTION_MONITORING_SLACK }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_NOTIFY_BUILD }}
