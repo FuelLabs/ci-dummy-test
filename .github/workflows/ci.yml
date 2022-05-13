@@ -704,17 +704,17 @@ jobs:
           gzip -c $(which forc) > ./$FORC_ZIP_FILE_NAME
 
           # forc-fmt
-          FORC_FMT_ZIP_FILE_NAME=forc.${{ env.PLATFORM_NAME }}_${{ env.ARCH }}.gz
+          FORC_FMT_ZIP_FILE_NAME=forc-fmt.${{ env.PLATFORM_NAME }}_${{ env.ARCH }}.gz
           echo "FORC_FMT_ZIP_FILE_NAME=$FORC_FMT_ZIP_FILE_NAME" >> $GITHUB_ENV
           gzip -c $(which forc-fmt) > ./$FORC_FMT_ZIP_FILE_NAME
 
           # forc-lsp
-          FORC_LSP_ZIP_FILE_NAME=forc.${{ env.PLATFORM_NAME }}_${{ env.ARCH }}.gz
+          FORC_LSP_ZIP_FILE_NAME=forc-lsp.${{ env.PLATFORM_NAME }}_${{ env.ARCH }}.gz
           echo "FORC_LSP_ZIP_FILE_NAME=$FORC_LSP_ZIP_FILE_NAME" >> $GITHUB_ENV
           gzip -c $(which forc-fmt) > ./$FORC_LSP_ZIP_FILE_NAME
 
           # forc-explore
-          FORC_EXPLORE_ZIP_FILE_NAME=forc.${{ env.PLATFORM_NAME }}_${{ env.ARCH }}.gz
+          FORC_EXPLORE_ZIP_FILE_NAME=forc-explore.${{ env.PLATFORM_NAME }}_${{ env.ARCH }}.gz
           echo "FORC_EXPLORE_ZIP_FILE_NAME=$FORC_EXPLORE_ZIP_FILE_NAME" >> $GITHUB_ENV
           gzip -c $(which forc-fmt) > ./$FORC_EXPLORE_ZIP_FILE_NAME
 
