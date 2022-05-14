@@ -722,11 +722,11 @@ jobs:
           TARGET: ${{ matrix.job.target }}
           ARCH: ${{ matrix.job.arch }}
         run: |
-          mkdir ./binaries
-          cp $(which forc) ./forc-binaries
-          cp $(which forc-fmt) ./forc-binaries
-          cp $(which forc-lsp) ./forc-binaries
-          cp $(which forc-explore) ./forc-binaries
+          mkdir -pv ./binaries
+          for binary in forc forc-fmt forc-lsp forc-explore; do
+            cp $(which ${binary}) ./forc-binaries
+            gzip -c ./forc-binaries/$binary > ./forc-binaries/$binary.${{ env.PLATFORM_NAME }}_${{ env.ARCH }}.gz
+          done
 
           ZIP_FILE_NAME=forc-binaries-${{ env.PLATFORM_NAME }}_${{ env.ARCH }}.tar.gz
           echo "ZIP_FILE_NAME=$ZIP_FILE_NAME" >> $GITHUB_ENV
