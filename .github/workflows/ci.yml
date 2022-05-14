@@ -716,30 +716,29 @@ jobs:
           args: --debug --path ./forc-explore
 
       - name: Prep Assets
-        id: prep_assets
-        env:
-          PLATFORM_NAME: ${{ matrix.job.platform }}
-          TARGET: ${{ matrix.job.target }}
-          ARCH: ${{ matrix.job.arch }}
-        run: |
-          mkdir -pv ./binaries
-          for binary in forc forc-fmt forc-lsp forc-explore; do
-            cp $(which ${binary}) ./forc-binaries
-            gzip -c ./forc-binaries/$binary > ./forc-binaries/$binary.${{ env.PLATFORM_NAME }}_${{ env.ARCH }}.gz
-          done
+      id: prep_assets
+      env:
+        PLATFORM_NAME: ${{ matrix.job.platform }}
+        TARGET: ${{ matrix.job.target }}
+        ARCH: ${{ matrix.job.arch }}
+      run: |
+        mkdir -pv ./binaries
+        for binary in forc forc-fmt forc-lsp forc-explore; do
+          cp $(which ${binary}) ./forc-binaries
+        done
 
-          ZIP_FILE_NAME=forc-binaries-${{ env.PLATFORM_NAME }}_${{ env.ARCH }}.tar.gz
-          echo "ZIP_FILE_NAME=$ZIP_FILE_NAME" >> $GITHUB_ENV
+        ZIP_FILE_NAME=forc-binaries-${{ env.PLATFORM_NAME }}_${{ env.ARCH }}.tar.gz
+        echo "ZIP_FILE_NAME=$ZIP_FILE_NAME" >> $GITHUB_ENV
 
-          tar -czvf $ZIP_FILE_NAME ./forc-binaries
+        tar -czvf $ZIP_FILE_NAME ./forc-binaries
 
       - name: Archive forc binaries
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./${{ env.ZIP_FILE_NAME }}
-          asset_name: ${{ env.ZIP_FILE_NAME }}
-          asset_content_type: application/gzip
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: ./${{ env.ZIP_FILE_NAME }}
+        asset_name: ${{ env.ZIP_FILE_NAME }}
+        asset_content_type: application/gzip
           
