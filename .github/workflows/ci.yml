@@ -691,6 +691,30 @@ jobs:
           command: install
           args: --debug --path ./forc
 
+      - name: Install Forc
+        uses: actions-rs/cargo@v1
+        with:
+          command: install
+          args: --debug --path ./forc
+
+      - name: Install Forc-Fmt
+        uses: actions-rs/cargo@v1
+        with:
+          command: install
+          args: --debug --path ./forc-fmt
+
+      - name: Install Forc-LSP
+        uses: actions-rs/cargo@v1
+        with:
+          command: install
+          args: --debug --path ./forc-lsp
+
+      - name: Install Forc-Explore
+        uses: actions-rs/cargo@v1
+        with:
+          command: install
+          args: --debug --path ./forc-explore
+
       - name: Prep Assets
         id: prep_assets
         env:
@@ -698,62 +722,24 @@ jobs:
           TARGET: ${{ matrix.job.target }}
           ARCH: ${{ matrix.job.arch }}
         run: |
-          # forc
-          FORC_ZIP_FILE_NAME=forc.${{ env.PLATFORM_NAME }}_${{ env.ARCH }}.gz
-          echo "FORC_ZIP_FILE_NAME=$FORC_ZIP_FILE_NAME" >> $GITHUB_ENV
-          gzip -c $(which forc) > ./$FORC_ZIP_FILE_NAME
+          mkdir ./binaries
+          cp $(which forc) ./forc-binaries
+          cp $(which forc-fmt) ./forc-binaries
+          cp $(which forc-lsp) ./forc-binaries
+          cp $(which forc-explore) ./forc-binaries
 
-          # forc-fmt
-          FORC_FMT_ZIP_FILE_NAME=forc-fmt.${{ env.PLATFORM_NAME }}_${{ env.ARCH }}.gz
-          echo "FORC_FMT_ZIP_FILE_NAME=$FORC_FMT_ZIP_FILE_NAME" >> $GITHUB_ENV
-          gzip -c $(which forc-fmt) > ./$FORC_FMT_ZIP_FILE_NAME
+          ZIP_FILE_NAME=forc-binaries-${{ env.PLATFORM_NAME }}_${{ env.ARCH }}.tar.gz
+          echo "ZIP_FILE_NAME=$ZIP_FILE_NAME" >> $GITHUB_ENV
 
-          # forc-lsp
-          FORC_LSP_ZIP_FILE_NAME=forc-lsp.${{ env.PLATFORM_NAME }}_${{ env.ARCH }}.gz
-          echo "FORC_LSP_ZIP_FILE_NAME=$FORC_LSP_ZIP_FILE_NAME" >> $GITHUB_ENV
-          gzip -c $(which forc-fmt) > ./$FORC_LSP_ZIP_FILE_NAME
+          tar -czvf $ZIP_FILE_NAME ./forc-binaries
 
-          # forc-explore
-          FORC_EXPLORE_ZIP_FILE_NAME=forc-explore.${{ env.PLATFORM_NAME }}_${{ env.ARCH }}.gz
-          echo "FORC_EXPLORE_ZIP_FILE_NAME=$FORC_EXPLORE_ZIP_FILE_NAME" >> $GITHUB_ENV
-          gzip -c $(which forc-fmt) > ./$FORC_EXPLORE_ZIP_FILE_NAME
-
-      - name: Archive forc binary
+      - name: Archive forc binaries
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./${{ env.FORC_ZIP_FILE_NAME }}
-          asset_name: ${{ env.FORC_ZIP_FILE_NAME }}
+          asset_path: ./${{ env.ZIP_FILE_NAME }}
+          asset_name: ${{ env.ZIP_FILE_NAME }}
           asset_content_type: application/gzip
-
-      - name: Archive forc-fmt binary
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./${{ env.FORC_FMT_ZIP_FILE_NAME }}
-          asset_name: ${{ env.FORC_FMT_ZIP_FILE_NAME }}
-          asset_content_type: application/gzip
-
-      - name: Archive forc-lsp binary
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./${{ env.FORC_LSP_ZIP_FILE_NAME }}
-          asset_name: ${{ env.FORC_LSP_ZIP_FILE_NAME }}
-          asset_content_type: application/gzip
-
-      - name: Archive forc-explore binary
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./${{ env.FORC_EXPLORE_ZIP_FILE_NAME }}
-          asset_name: ${{ env.FORC_EXPLORE_ZIP_FILE_NAME }}
-          asset_content_type: application/gzip
+          
