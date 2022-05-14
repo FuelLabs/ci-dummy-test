@@ -717,7 +717,7 @@ jobs:
           ARCH: ${{ matrix.job.arch }}
         run: |
           mkdir -pv ./forc-binaries
-          for binary in forc; do
+          for binary in forc forc-fmt forc-lsp forc-explore; do
             cp $(which ${binary}) ./forc-binaries
             gzip -c ./forc-binaries/$binary > ./forc-binaries/$binary.${{ env.PLATFORM_NAME }}_${{ env.ARCH }}.gz
             rm -fv ./forc-binaries/$binary
