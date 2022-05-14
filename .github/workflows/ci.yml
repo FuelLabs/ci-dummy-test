@@ -691,23 +691,23 @@ jobs:
           command: install
           args: --debug --path ./forc
 
-      - name: Install Forc-Fmt
-        uses: actions-rs/cargo@v1
-        with:
-          command: install
-          args: --debug --path ./forc-fmt
+      # - name: Install Forc-Fmt
+      #   uses: actions-rs/cargo@v1
+      #   with:
+      #     command: install
+      #     args: --debug --path ./forc-fmt
 
-      - name: Install Forc-LSP
-        uses: actions-rs/cargo@v1
-        with:
-          command: install
-          args: --debug --path ./forc-lsp
+      # - name: Install Forc-LSP
+      #   uses: actions-rs/cargo@v1
+      #   with:
+      #     command: install
+      #     args: --debug --path ./forc-lsp
 
-      - name: Install Forc-Explore
-        uses: actions-rs/cargo@v1
-        with:
-          command: install
-          args: --debug --path ./forc-explore
+      # - name: Install Forc-Explore
+      #   uses: actions-rs/cargo@v1
+      #   with:
+      #     command: install
+      #     args: --debug --path ./forc-explore
 
       - name: Prep Assets
         id: prep_assets
@@ -716,10 +716,11 @@ jobs:
           TARGET: ${{ matrix.job.target }}
           ARCH: ${{ matrix.job.arch }}
         run: |
-          mkdir -pv ./binaries
+          mkdir -pv ./forc-binaries
           for binary in forc forc-fmt forc-lsp forc-explore; do
             cp $(which ${binary}) ./forc-binaries
             gzip -c ./forc-binaries/$binary > ./forc-binaries/$binary.${{ env.PLATFORM_NAME }}_${{ env.ARCH }}.gz
+            rm -fv ./forc-binaries/$binary
           done
 
           ZIP_FILE_NAME=forc-binaries-${{ env.PLATFORM_NAME }}_${{ env.ARCH }}.tar.gz
