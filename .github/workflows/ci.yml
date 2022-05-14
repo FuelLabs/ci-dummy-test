@@ -689,25 +689,25 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: install
-          args: --debug --path ./forc
+          args: --release --path ./forc
 
-      # - name: Install Forc-Fmt
-      #   uses: actions-rs/cargo@v1
-      #   with:
-      #     command: install
-      #     args: --debug --path ./forc-fmt
+      - name: Install Forc-Fmt
+        uses: actions-rs/cargo@v1
+        with:
+          command: install
+          args: --release --path ./forc-fmt
 
-      # - name: Install Forc-LSP
-      #   uses: actions-rs/cargo@v1
-      #   with:
-      #     command: install
-      #     args: --debug --path ./forc-lsp
+      - name: Install Forc-LSP
+        uses: actions-rs/cargo@v1
+        with:
+          command: install
+          args: --release --path ./forc-lsp
 
-      # - name: Install Forc-Explore
-      #   uses: actions-rs/cargo@v1
-      #   with:
-      #     command: install
-      #     args: --debug --path ./forc-explore
+      - name: Install Forc-Explore
+        uses: actions-rs/cargo@v1
+        with:
+          command: install
+          args: --release --path ./forc-explore
 
       - name: Prep Assets
         id: prep_assets
