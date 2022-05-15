@@ -716,11 +716,14 @@ jobs:
           TARGET: ${{ matrix.job.target }}
           ARCH: ${{ matrix.job.arch }}
         run: |
+          ZIP_FILE_NAME=forc-binaries-${{ env.PLATFORM_NAME }}_${{ env.ARCH }}.tar.gz
+          echo "ZIP_FILE_NAME=$ZIP_FILE_NAME" >> $GITHUB_ENV
           mkdir -pv ./forc-binaries
           for binary in forc forc-fmt forc-lsp forc-explore; do
             cp $(which ${binary}) ./forc-binaries
           done
-          tar -czvf forc-binaries-${{ env.PLATFORM_NAME }}_${{ env.ARCH }}.tar.gz ./forc-binaries
+          tar -czvf $ZIP_FILE_NAME ./forc-binaries
+
       - name: Archive forc binaries
         uses: actions/upload-release-asset@v1
         env:
