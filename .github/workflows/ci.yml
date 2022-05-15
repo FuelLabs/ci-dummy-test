@@ -719,15 +719,8 @@ jobs:
           mkdir -pv ./forc-binaries
           for binary in forc forc-fmt forc-lsp forc-explore; do
             cp $(which ${binary}) ./forc-binaries
-            gzip -c ./forc-binaries/$binary > ./forc-binaries/$binary.${{ env.PLATFORM_NAME }}_${{ env.ARCH }}.gz
-            rm -fv ./forc-binaries/$binary
           done
-
-          ZIP_FILE_NAME=forc-binaries-${{ env.PLATFORM_NAME }}_${{ env.ARCH }}.tar.gz
-          echo "ZIP_FILE_NAME=$ZIP_FILE_NAME" >> $GITHUB_ENV
-
-          tar -czvf $ZIP_FILE_NAME ./forc-binaries
-
+          tar -czvf forc-binaries-${{ env.PLATFORM_NAME }}_${{ env.ARCH }}.tar.gz ./forc-binaries
       - name: Archive forc binaries
         uses: actions/upload-release-asset@v1
         env:
