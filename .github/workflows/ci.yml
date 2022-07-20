@@ -89,84 +89,84 @@ jobs:
   #     - name: Run Cargo.toml linter
   #       run: git ls-files | grep Cargo.toml$ | xargs --verbose -n 1 cargo-toml-lint
 
-  # cargo-verifications:
-  #   runs-on: ubuntu-latest
-  #   services:
-  #     postgres:
-  #       image: postgres:latest
-  #       env:
-  #         POSTGRES_PASSWORD: my-secret
-  #         POSTGRES_DB: postgres
-  #         POSTGRES_USER: postgres
-  #       ports:
-  #         - 5432:5432
-  #       options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-  #   needs:
-  #     - cancel-previous-runs
-  #     - cargo-unused-deps-check
-  #     - cargo-toml-fmt-check
-  #   strategy:
-  #     matrix:
-  #       include:
-  #         - command: fmt
-  #           args: --all --verbose -- --check
-  #         - command: clippy
-  #           args: --all-features --all-targets -- -D warnings -Aclippy::extra-unused-lifetimes
-  #         - command: check
-  #           args: --locked --workspace --all-features --all-targets
-  #           env:
-  #             RUSTFLAGS: '-D warnings'
-  #         - command: build
-  #           args: --locked --workspace --all-features --all-targets
-  #           env:
-  #             RUSTFLAGS: '-D warnings'
-  #         # Default features
-  #         - command: test
-  #           args: --locked --workspace
-  #         # All features
-  #         - command: test
-  #           args: --locked --all-targets --all-features --workspace
-  #           env:
-  #             RUSTFLAGS: '-D warnings'
-  #         # No default features
-  #         - command: test
-  #           args: --locked --all-targets --no-default-features --workspace
-  #           env:
-  #             RUSTFLAGS: '-D warnings'
-  #   # disallow any job that takes longer than 30 minutes
-  #   timeout-minutes: 45
-  #   continue-on-error: ${{ matrix.skip-error || false }}
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - uses: actions-rs/toolchain@v1
-  #       with:
-  #         toolchain: stable
-  #     - uses: Swatinem/rust-cache@v1
-  #       with:
-  #         key: '${{ matrix.command }} ${{ matrix.args }}'
-  #     - run: cargo install diesel_cli
-  #     - run: |
-  #         cd schema
-  #         diesel migration run --migration-dir migrations/postgres/
-  #         cargo fmt
-  #     - name: ${{ matrix.command }} ${{ matrix.args }}
-  #       uses: actions-rs/cargo@v1
-  #       with:
-  #         command: ${{ matrix.command }}
-  #         args: ${{ matrix.args }}
-  #     - name: Notify if Job Fails
-  #       uses: ravsamhq/notify-slack-action@v1
-  #       if: always() && github.ref == 'refs/heads/master'
-  #       with:
-  #         status: ${{ job.status }}
-  #         token: ${{ secrets.GITHUB_TOKEN }}
-  #         notification_title: '{workflow} has {status_message}'
-  #         message_format: '{emoji} *{workflow}* {status_message} in <{repo_url}|{repo}> : <{run_url}|View Run Results>'
-  #         footer: ''
-  #         notify_when: 'failure'
-  #       env:
-  #         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_NOTIFY_BUILD }}
-  #         RUSTFLAGS: -D warnings
+  cargo-verifications:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_PASSWORD: my-secret
+          POSTGRES_DB: postgres
+          POSTGRES_USER: postgres
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+    needs:
+      - cancel-previous-runs
+      - cargo-unused-deps-check
+      - cargo-toml-fmt-check
+    strategy:
+      matrix:
+        include:
+          # - command: fmt
+          #   args: --all --verbose -- --check
+          # - command: clippy
+          #   args: --all-features --all-targets -- -D warnings -Aclippy::extra-unused-lifetimes
+          # - command: check
+          #   args: --locked --workspace --all-features --all-targets
+          #   env:
+          #     RUSTFLAGS: '-D warnings'
+          - command: build
+            args: --locked --workspace --all-features --all-targets
+            env:
+              RUSTFLAGS: '-D warnings'
+          # # Default features
+          # - command: test
+          #   args: --locked --workspace
+          # # All features
+          # - command: test
+          #   args: --locked --all-targets --all-features --workspace
+          #   env:
+          #     RUSTFLAGS: '-D warnings'
+          # # No default features
+          # - command: test
+          #   args: --locked --all-targets --no-default-features --workspace
+          #   env:
+          #     RUSTFLAGS: '-D warnings'
+    # disallow any job that takes longer than 30 minutes
+    timeout-minutes: 45
+    continue-on-error: ${{ matrix.skip-error || false }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - uses: Swatinem/rust-cache@v1
+        with:
+          key: '${{ matrix.command }} ${{ matrix.args }}'
+      - run: cargo install diesel_cli
+      - run: |
+          cd schema
+          diesel migration run --migration-dir migrations/postgres/
+          cargo fmt
+      - name: ${{ matrix.command }} ${{ matrix.args }}
+        uses: actions-rs/cargo@v1
+        with:
+          command: ${{ matrix.command }}
+          args: ${{ matrix.args }}
+      - name: Notify if Job Fails
+        uses: ravsamhq/notify-slack-action@v1
+        if: always() && github.ref == 'refs/heads/master'
+        with:
+          status: ${{ job.status }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          notification_title: '{workflow} has {status_message}'
+          message_format: '{emoji} *{workflow}* {status_message} in <{repo_url}|{repo}> : <{run_url}|View Run Results>'
+          footer: ''
+          notify_when: 'failure'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_NOTIFY_BUILD }}
+          RUSTFLAGS: -D warnings
 
   publish-fuel-indexer-binaries:
     name: Release fuel-indexer binaries
@@ -176,6 +176,7 @@ jobs:
       - cancel-previous-runs
       # - cargo-unused-deps-check
       # - cargo-toml-fmt-check
+      - cargo-verifications
     # if: github.event_name == 'release' && github.event.action == 'published'
     strategy:
       matrix:
@@ -242,10 +243,6 @@ jobs:
         with:
           crate: cross
           cache-key: '${{ matrix.job.target }}'
-
-      - name: Get clang version
-        run: |
-          echo "Clang version is: $(clang --version)"
 
       - name: Build fuel-executor
         run: |
@@ -383,7 +380,7 @@ jobs:
 
   validation-complete:
     needs:
-      # - cargo-verifications
+      - cargo-verifications
       # - mdbook-build
       - publish-fuel-indexer-binaries
     runs-on: ubuntu-latest
