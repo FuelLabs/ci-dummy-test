@@ -1,7 +1,0 @@
-[[package]]
-name = 'core'
-dependencies = []
-
-[[package]]
-name = 'import_method_from_other_file'
-dependencies = ['core']

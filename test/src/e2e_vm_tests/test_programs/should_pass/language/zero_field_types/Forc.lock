@@ -1,7 +1,0 @@
-[[package]]
-name = 'core'
-dependencies = []
-
-[[package]]
-name = 'zero_field_types'
-dependencies = ['core']
