@@ -1,7 +1,0 @@
-[[package]]
-name = 'const_decl'
-dependencies = ['core']
-
-[[package]]
-name = 'core'
-dependencies = []

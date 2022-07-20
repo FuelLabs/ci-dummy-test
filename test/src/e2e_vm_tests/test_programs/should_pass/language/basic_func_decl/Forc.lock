@@ -1,7 +1,0 @@
-[[package]]
-name = 'basic_func_decl'
-dependencies = ['core']
-
-[[package]]
-name = 'core'
-dependencies = []
