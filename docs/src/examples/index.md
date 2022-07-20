@@ -1,8 +1,8 @@
-# Example
+# Examples
 
-Some basic example contracts to see how Sway and Forc work.
-
-- [Counter](./counter.md)
-- [Subcurrency](./subcurrency.md)
-- [FizzBuzz](./fizzbuzz.md)
-- [Wallet Smart Contract](./wallet_smart_contract.md)
+- [Hello World](./hello-indexer.md)
+  - A simple application representing the "Hello world" version of a Fuel indexer
+  - This example includes WASM execution
+- [Simple Native](./simple-native.md)
+  - A simple example of an indexer within a full Fuel project. 
+  - Also demonstrates native execution.
