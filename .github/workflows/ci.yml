@@ -104,7 +104,7 @@ jobs:
     needs:
       - cancel-previous-runs
       # - cargo-unused-deps-check
-      - cargo-toml-fmt-check
+      # - cargo-toml-fmt-check
     strategy:
       matrix:
         include:
