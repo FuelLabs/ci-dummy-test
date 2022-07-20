@@ -103,7 +103,7 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     needs:
       - cancel-previous-runs
-      - cargo-unused-deps-check
+      # - cargo-unused-deps-check
       - cargo-toml-fmt-check
     strategy:
       matrix:
