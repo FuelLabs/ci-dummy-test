@@ -1,7 +1,0 @@
-[[package]]
-name = 'core'
-dependencies = []
-
-[[package]]
-name = 'multi_item_import'
-dependencies = ['core']

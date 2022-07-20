@@ -1,7 +1,0 @@
-[[package]]
-name = 'bool_and_or'
-dependencies = ['core']
-
-[[package]]
-name = 'core'
-dependencies = []

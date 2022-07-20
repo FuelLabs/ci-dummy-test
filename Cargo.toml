@@ -1,29 +1,18 @@
 [workspace]
+# Use the new resolver to prevent dev-deps and build-deps from enabling debugging or test features in production.
 resolver = "2"
 members = [
-    "docstrings",
-    "forc",
-    "forc-explore",
-    "forc-fmt",
-    "forc-gm",
-    "forc-lsp",
-    "forc-pkg",
-    "forc-util",
-    "scripts/examples-checker",
-    "scripts/forc-documenter",
-    "sway-core",
-    "sway-fmt",
-    "sway-ir",
-    "sway-lsp",
-    "sway-parse",
-    "sway-types",
-    "sway-utils",
-    "test",
-    "test-sig-gen-util",
-]
-exclude = [
-    "examples/*"
+   "api_server",
+   "derive",
+   "lib",
+   "indexer",
+   "indexer-lib",
+   "examples/*",
+   "examples/simple-native/counter-rs",
+   "schema"
 ]
 
-[profile.dev.package.sway-lsp]
-debug = 2
+[profile.release]
+codegen-units = 1
+lto = "fat"
+panic = "abort"

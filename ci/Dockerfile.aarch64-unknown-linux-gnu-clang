@@ -1,0 +1,16 @@
+FROM ghcr.io/cross-rs/aarch64-unknown-linux-gnu:main
+
+RUN dpkg --add-architecture arm64 && \
+    apt-get update && \
+    apt-get update && apt-get install --assume-yes \
+        binutils-aarch64-linux-gnu \
+        build-essential \
+        clang \
+        cmake \
+        gcc \
+        git \
+        libclang-dev \
+        libpq-dev \
+        lld \
+        llvm \
+        pkg-config

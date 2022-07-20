@@ -1,7 +1,0 @@
-[[package]]
-name = 'core'
-dependencies = []
-
-[[package]]
-name = 'enum_bad_type_inference'
-dependencies = ['core']
