@@ -176,7 +176,7 @@ jobs:
       - cancel-previous-runs
       # - cargo-unused-deps-check
       # - cargo-toml-fmt-check
-    if: github.event_name == 'release' && github.event.action == 'published'
+    # if: github.event_name == 'release' && github.event.action == 'published'
     strategy:
       matrix:
         job:
@@ -184,24 +184,24 @@ jobs:
             platform: linux
             target: x86_64-unknown-linux-gnu
             cross_image: x86_64-linux-gnu
-          - os: ubuntu-latest
-            platform: linux
-            target: x86_64-unknown-linux-musl
-            cross_image: x86_64-linux-musl
-          - os: ubuntu-latest
-            platform: linux-arm
-            target: aarch64-unknown-linux-gnu
-            cross_image: aarch64-linux-gnu
-          - os: ubuntu-latest
-            platform: linux-arm
-            target: aarch64-unknown-linux-musl
-            cross_image: aarch64-linux-musl
-          - os: macos-latest
-            platform: darwin
-            target: x86_64-apple-darwin
-          - os: macos-latest
-            platform: darwin-arm
-            target: aarch64-apple-darwin
+          # - os: ubuntu-latest
+          #   platform: linux
+          #   target: x86_64-unknown-linux-musl
+          #   cross_image: x86_64-linux-musl
+          # - os: ubuntu-latest
+          #   platform: linux-arm
+          #   target: aarch64-unknown-linux-gnu
+          #   cross_image: aarch64-linux-gnu
+          # - os: ubuntu-latest
+          #   platform: linux-arm
+          #   target: aarch64-unknown-linux-musl
+          #   cross_image: aarch64-linux-musl
+          # - os: macos-latest
+          #   platform: darwin
+          #   target: x86_64-apple-darwin
+          # - os: macos-latest
+          #   platform: darwin-arm
+          #   target: aarch64-apple-darwin
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -242,6 +242,10 @@ jobs:
         with:
           crate: cross
           cache-key: '${{ matrix.job.target }}'
+
+      - name: Get clang version
+        run: |
+          echo "Clang version is: $(clang --version)"
 
       - name: Build fuel-executor
         run: |
