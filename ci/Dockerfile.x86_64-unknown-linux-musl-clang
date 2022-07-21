@@ -1,15 +1,19 @@
-FROM ghcr.io/cross-rs/x86_64-unknown-linux-musl:main
+FROM ubuntu:22.04
 
 RUN apt-get update && \
-    apt-get install --assume-yes \
-    binutils-aarch64-linux-gnu \
-    build-essential \
-    clang \
-    cmake \
-    gcc \
-    git \
-    libclang-dev \
-    libpq-dev \
-    lld \
-    llvm \
-    pkg-config
+    # https://askubuntu.com/a/1129284
+    DEBIAN_FRONTEND=noninteractive apt-get install -y \
+        binutils-aarch64-linux-gnu \
+        build-essential \
+        clang \
+        cmake \
+        gcc \
+        git \
+        libclang-dev \
+        libpq5 \
+        libpq-dev \
+        lld \
+        llvm \
+        pkg-config \
+        tzdata \
+        && apt-get clean

@@ -1,7 +1,7 @@
 FROM ghcr.io/cross-rs/aarch64-unknown-linux-musl:main
 
 RUN dpkg --add-architecture arm64 && \
-    apt-get update && apt-get install --assume-yes \
+    apt-get update && apt-get install -y \
         binutils-aarch64-linux-gnu \
         build-essential \
         clang \
@@ -12,4 +12,6 @@ RUN dpkg --add-architecture arm64 && \
         libpq-dev \
         lld \
         llvm \
-        pkg-config
+        pkg-config \
+        tzdata \
+        && apt-get clean

@@ -1,8 +1,10 @@
 FROM ghcr.io/cross-rs/aarch64-unknown-linux-gnu:main
 
+ARG DEBIAN_FRONTEND=noninteractive
+
 RUN dpkg --add-architecture arm64 && \
     apt-get update && \
-    apt-get update && apt-get install --assume-yes \
+    apt-get update && apt-get install -y \
         binutils-aarch64-linux-gnu \
         build-essential \
         clang \
@@ -13,4 +15,5 @@ RUN dpkg --add-architecture arm64 && \
         libpq-dev \
         lld \
         llvm \
-        pkg-config
+        pkg-config \
+        && apt-get clean
