@@ -1,4 +1,2 @@
-# we don't need example binaries in the release
-examples/**/target
-target/debug/
-
+**/target
+manifest.yaml

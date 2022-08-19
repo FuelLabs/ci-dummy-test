@@ -1,10 +1,10 @@
 extern crate alloc;
 use anyhow::Result;
-use fuel_executor::{
+use fuel_indexer::{
     Address, GraphQlApi, IndexerArgs, IndexerConfig, IndexerResult, IndexerService, Manifest,
     NativeHandlerResult, Parser, Receipt,
 };
-use fuel_indexer_derive::graphql_schema;
+use fuel_indexer_macros::graphql_schema;
 use fuels::core::{abi_decoder::ABIDecoder, ParamType, Tokenizable};
 use fuels_abigen_macro::abigen;
 use tokio::join;
@@ -24,13 +24,17 @@ fn count_handler(receipt: Receipt) -> Option<IndexerResult<NativeHandlerResult>>
     match receipt {
         Receipt::ReturnData { data, .. } => {
             // Define which params we expect (using the counter-abi.json as a reference)
-            let params = ParamType::Struct(vec![ParamType::U64, ParamType::U64, ParamType::U64]);
+            let params = vec![ParamType::Struct(vec![
+                ParamType::U64,
+                ParamType::U64,
+                ParamType::U64,
+            ])];
 
             // Decode the data into a Token using these params
-            let token = ABIDecoder::decode_single(&params, &data).unwrap();
+            let token = ABIDecoder::decode(&params, &data).unwrap();
 
             // Recover the CountEvent from this token
-            let event = CountEvent::from_token(token).unwrap();
+            let event = CountEvent::from_token(token[0].to_owned()).unwrap();
 
             // Using the Count entity from the GraphQL schema
             let count = Count {
