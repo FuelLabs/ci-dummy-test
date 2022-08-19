@@ -175,7 +175,7 @@ jobs:
     needs:
       - cancel-previous-runs
       # - cargo-verifications
-    # if: github.event_name == 'release' && github.event.action == 'published'
+    if: github.event_name == 'release' && github.event.action == 'published'
     strategy:
       matrix:
         job:
@@ -195,9 +195,9 @@ jobs:
           #   platform: linux-arm
           #   target: aarch64-unknown-linux-musl
           #   cross_image: aarch64-linux-musl
-          - os: macos-latest
-            platform: darwin
-            target: x86_64-apple-darwin
+          # - os: macos-latest
+          #   platform: darwin
+          #   target: x86_64-apple-darwin
           # - os: macos-latest
           #   platform: darwin-arm
           #   target: aarch64-apple-darwin
@@ -243,13 +243,13 @@ jobs:
           crate: cross
           cache-key: '${{ matrix.job.target }}'
 
-      - name: Build fuel-executor
+      - name: Build fuel-indexer
         run: |
-          cross build --locked --profile=release --target ${{ matrix.job.target }} -p fuel-executor
+          cross build --locked --profile=release --target ${{ matrix.job.target }} -p fuel-indexer
 
       - name: Strip release binary linux x86_64
         if: matrix.job.platform == 'linux'
-        run: strip "target/${{ matrix.job.target }}/release/fuel-executor"
+        run: strip "target/${{ matrix.job.target }}/release/fuel-indexer"
 
       - name: Strip release binary aarch64-linux-gnu
         if: matrix.job.target == 'aarch64-unknown-linux-gnu'
@@ -258,7 +258,7 @@ jobs:
           "$PWD/target:/target:Z" \
           aarch64-linux-gnu:latest \
           aarch64-linux-gnu-strip \
-          /target/aarch64-unknown-linux-gnu/release/fuel-executor
+          /target/aarch64-unknown-linux-gnu/release/fuel-indexer
 
       - name: Strip release binary aarch64-linux-musl
         if: matrix.job.target == 'aarch64-unknown-linux-musl'
@@ -267,40 +267,40 @@ jobs:
           "$PWD/target:/target:Z" \
           aarch64-linux-musl:latest \
           aarch64-linux-musl-strip \
-          /target/aarch64-unknown-linux-musl/release/fuel-executor
+          /target/aarch64-unknown-linux-musl/release/fuel-indexer
           
       - name: Strip release binary mac
         if: matrix.job.os == 'macos-latest'
-        run: strip -x "target/${{ matrix.job.target }}/release/fuel-executor"
+        run: strip -x "target/${{ matrix.job.target }}/release/fuel-indexer"
 
-      # - name: Prepare Binary Artifact
-      #   env:
-      #     PLATFORM_NAME: ${{ matrix.job.platform }}
-      #     TARGET: ${{ matrix.job.target }}
-      #   run: |
-      #     # trim refs/tags/ prefix
-      #     FUEL_CORE_VERSION="${GITHUB_REF#refs/tags/}"
-      #     # optionally trim v from tag prefix
-      #     FUEL_CORE_VERSION="${FUEL_CORE_VERSION#v}"
-      #     echo "version is: $FUEL_CORE_VERSION"
-      #     # setup artifact filename
-      #     ARTIFACT="fuel-executor-$FUEL_CORE_VERSION-${{ env.TARGET }}"
-      #     ZIP_FILE_NAME="$ARTIFACT.tar.gz"
-      #     echo "ZIP_FILE_NAME=$ZIP_FILE_NAME" >> $GITHUB_ENV
-      #     # create zip file
-      #     mkdir -pv "$ARTIFACT"
-      #     cp "target/${{ matrix.job.target }}/release/fuel-executor" "$ARTIFACT"
-      #     tar -czvf "$ZIP_FILE_NAME" "$ARTIFACT"
+      - name: Prepare Binary Artifact
+        env:
+          PLATFORM_NAME: ${{ matrix.job.platform }}
+          TARGET: ${{ matrix.job.target }}
+        run: |
+          # trim refs/tags/ prefix
+          FUEL_CORE_VERSION="${GITHUB_REF#refs/tags/}"
+          # optionally trim v from tag prefix
+          FUEL_CORE_VERSION="${FUEL_CORE_VERSION#v}"
+          echo "version is: $FUEL_CORE_VERSION"
+          # setup artifact filename
+          ARTIFACT="fuel-indexer-$FUEL_CORE_VERSION-${{ env.TARGET }}"
+          ZIP_FILE_NAME="$ARTIFACT.tar.gz"
+          echo "ZIP_FILE_NAME=$ZIP_FILE_NAME" >> $GITHUB_ENV
+          # create zip file
+          mkdir -pv "$ARTIFACT"
+          cp "target/${{ matrix.job.target }}/release/fuel-indexer" "$ARTIFACT"
+          tar -czvf "$ZIP_FILE_NAME" "$ARTIFACT"
 
-      # - name: Upload Binary Artifact
-      #   uses: actions/upload-release-asset@v1
-      #   env:
-      #     GITHUB_TOKEN: ${{ github.token }}
-      #   with:
-      #     upload_url: ${{ github.event.release.upload_url }}
-      #     asset_path: ./${{ env.ZIP_FILE_NAME }}
-      #     asset_name: ${{ env.ZIP_FILE_NAME }}
-      #     asset_content_type: application/gzip
+      - name: Upload Binary Artifact
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./${{ env.ZIP_FILE_NAME }}
+          asset_name: ${{ env.ZIP_FILE_NAME }}
+          asset_content_type: application/gzip
 
       - name: Notify if Job Fails
         uses: ravsamhq/notify-slack-action@v1
@@ -424,10 +424,10 @@ jobs:
         run: |
           curl -sSLf "https://github.com/TomWright/dasel/releases/download/v1.24.3/dasel_linux_amd64" -L -o dasel && chmod +x dasel
           mv ./dasel /usr/local/bin/dasel
-          ./.github/workflows/scripts/verify_tag.sh ${{ github.ref_name }} derive/Cargo.toml
-          ./.github/workflows/scripts/verify_tag.sh ${{ github.ref_name }} indexer/Cargo.toml
-          ./.github/workflows/scripts/verify_tag.sh ${{ github.ref_name }} lib/Cargo.toml
-          ./.github/workflows/scripts/verify_tag.sh ${{ github.ref_name }} schema/Cargo.toml
+          ./.github/workflows/scripts/verify_tag.sh ${{ github.ref_name }} fuel-indexer-macros/Cargo.toml
+          ./.github/workflows/scripts/verify_tag.sh ${{ github.ref_name }} fuel-indexer/Cargo.toml
+          ./.github/workflows/scripts/verify_tag.sh ${{ github.ref_name }} fuel-indexer-lib/Cargo.toml
+          ./.github/workflows/scripts/verify_tag.sh ${{ github.ref_name }} fuel-indexer-schema/Cargo.toml
       - name: Publish crate
         uses: katyo/publish-crates@v1
         with:
