@@ -1,7 +1,0 @@
-error: handler macro does not take arguments
- --> test_data/fail_args.rs:9:1
-  |
-9 | #[handler(SomeArg)]
-  | ^^^^^^^^^^^^^^^^^^^
-  |
-  = note: this error originates in the attribute macro `handler` (in Nightly builds, run with -Z macro-backtrace for more info)
