@@ -286,6 +286,7 @@ jobs:
             latest=${{ github.ref == 'refs/heads/master' }}
 
       - name: Set up Docker Buildx
+        if: matrix.job.cross_image
         uses: docker/setup-buildx-action@v2
 
       - name: Log in to the ghcr.io registry
