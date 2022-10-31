@@ -131,78 +131,78 @@ jobs:
         env:
           RUSTFLAGS: '-D warnings'
 
-  # cargo-verifications:
-  #   runs-on: ubuntu-latest
-  #   services:
-  #     postgres:
-  #       image: postgres:latest
-  #       env:
-  #         POSTGRES_PASSWORD: my-secret
-  #         POSTGRES_DB: postgres
-  #         POSTGRES_USER: postgres
-  #       ports:
-  #         - 5432:5432
-  #       options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-  #   needs:
-  #     - cancel-previous-runs
-  #     - cargo-toml-fmt-check
-  #     - cargo-build-wasm-example
-  #   strategy:
-  #     matrix:
-  #       include:
-  #         - command: fmt
-  #           args: --all --verbose -- --check
-  #           env:
-  #             RUSTFLAGS: '-D warnings'
-  #         - command: clippy
-  #           args: --all-features --all-targets
-  #           env:
-  #             RUSTFLAGS: '-D warnings'
-  #         - command: check
-  #           args: --locked --workspace --all-features --all-targets
-  #           env:
-  #             RUSTFLAGS: '-D warnings'
-  #         - command: build
-  #           args: --locked --workspace --all-features --all-targets
-  #           env:
-  #             RUSTFLAGS: '-D warnings'
-  #         - command: test
-  #           args: --locked --workspace
-  #           env:
-  #             RUSTFLAGS: '-D warnings'
-  #         - command: test
-  #           args: --locked --all-targets --no-default-features --workspace
-  #           env:
-  #             RUSTFLAGS: '-D warnings'
-  #   # disallow any job that takes longer than 45 minutes
-  #   timeout-minutes: 45
-  #   continue-on-error: ${{ matrix.skip-error || false }}
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - uses: actions-rs/toolchain@v1
-  #       with:
-  #         profile: minimal
-  #         toolchain: stable
-  #     - run: cargo install sqlx-cli
-  #     - run: bash scripts/run_migrations.bash
-  #     - name: ${{ matrix.command }} ${{ matrix.args }}
-  #       uses: actions-rs/cargo@v1
-  #       with:
-  #         command: ${{ matrix.command }}
-  #         args: ${{ matrix.args }}
-  #     - name: Notify if Job Fails
-  #       uses: ravsamhq/notify-slack-action@v1
-  #       if: always() && github.ref == 'refs/heads/master'
-  #       with:
-  #         status: ${{ job.status }}
-  #         token: ${{ secrets.GITHUB_TOKEN }}
-  #         notification_title: '{workflow} has {status_message}'
-  #         message_format: '{emoji} *{workflow}* {status_message} in <{repo_url}|{repo}> : <{run_url}|View Run Results>'
-  #         footer: ''
-  #         notify_when: 'failure'
-  #       env:
-  #         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_NOTIFY_BUILD }}
-  #         RUSTFLAGS: -D warnings
+  cargo-verifications:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_PASSWORD: my-secret
+          POSTGRES_DB: postgres
+          POSTGRES_USER: postgres
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+    needs:
+      - cancel-previous-runs
+      - cargo-toml-fmt-check
+      - cargo-build-wasm-example
+    strategy:
+      matrix:
+        include:
+          - command: fmt
+            args: --all --verbose -- --check
+            env:
+              RUSTFLAGS: '-D warnings'
+          # - command: clippy
+          #   args: --all-features --all-targets
+          #   env:
+          #     RUSTFLAGS: '-D warnings'
+          # - command: check
+          #   args: --locked --workspace --all-features --all-targets
+          #   env:
+          #     RUSTFLAGS: '-D warnings'
+          # - command: build
+          #   args: --locked --workspace --all-features --all-targets
+          #   env:
+          #     RUSTFLAGS: '-D warnings'
+          # - command: test
+          #   args: --locked --workspace
+          #   env:
+          #     RUSTFLAGS: '-D warnings'
+          # - command: test
+          #   args: --locked --all-targets --no-default-features --workspace
+          #   env:
+          #     RUSTFLAGS: '-D warnings'
+    # disallow any job that takes longer than 45 minutes
+    timeout-minutes: 45
+    continue-on-error: ${{ matrix.skip-error || false }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+      - run: cargo install sqlx-cli
+      - run: bash scripts/run_migrations.bash
+      - name: ${{ matrix.command }} ${{ matrix.args }}
+        uses: actions-rs/cargo@v1
+        with:
+          command: ${{ matrix.command }}
+          args: ${{ matrix.args }}
+      - name: Notify if Job Fails
+        uses: ravsamhq/notify-slack-action@v1
+        if: always() && github.ref == 'refs/heads/master'
+        with:
+          status: ${{ job.status }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          notification_title: '{workflow} has {status_message}'
+          message_format: '{emoji} *{workflow}* {status_message} in <{repo_url}|{repo}> : <{run_url}|View Run Results>'
+          footer: ''
+          notify_when: 'failure'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_NOTIFY_BUILD }}
+          RUSTFLAGS: -D warnings
 
   # NOTE: This can possibly figure out how to put this in cargo-verifications later
   cargo-test-workspace-all-features:
@@ -229,70 +229,50 @@ jobs:
       - run: cargo install sqlx-cli
       - run: bash scripts/run_migrations.bash
 
-      - name: Build fuel-indexer and fuel-indexer-test-web
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: -p fuel-indexer -p fuel-indexer-test-web --locked --release
-        env:
-          RUSTFLAGS: '-D warnings'
+      # - name: Build fuel-indexer and fuel-indexer-test-web
+      #   uses: actions-rs/cargo@v1
+      #   with:
+      #     command: build
+      #     args: -p fuel-indexer -p fuel-indexer-test-web --locked --release
+      #   env:
+      #     RUSTFLAGS: '-D warnings'
 
-      - name: Install wasm-snip
-        run: cargo install wasm-snip
-      - name: Build updated WASM test module
-        run: bash scripts/utils/build_test_wasm_module.bash
-      - name: Start test web components
-        run: bash scripts/utils/start_test_components.bash
+      # - name: Install wasm-snip
+      #   run: cargo install wasm-snip
+      # - name: Build updated WASM test module
+      #   run: bash scripts/utils/build_test_wasm_module.bash
+      # - name: Start test web components
+      #   run: bash scripts/utils/start_test_components.bash
 
-      - name: Cargo Test Workspace
-        uses: actions-rs/cargo@v1
-      - run: RUSTFLAGS='-D warnings' SQLX_OFFLINE=1 cargo test --locked --workspace --all-features --all-targets
-      - run: bash scripts/utils/kill_test_components.bash
+      # - name: Cargo Test Workspace
+      #   uses: actions-rs/cargo@v1
+      # - run: RUSTFLAGS='-D warnings' SQLX_OFFLINE=1 cargo test --locked --workspace --all-features --all-targets
+      # - run: bash scripts/utils/kill_test_components.bash
 
-  publish-fuel-indexer-binary:
+  publish-fuel-indexer-binaries:
     name: Release fuel-indexer binaries
     runs-on: ${{ matrix.job.os }}
-    # Only do this job if publishing a release
     needs:
       - cancel-previous-runs
+      - cargo-test-workspace-all-features
+      - cargo-verifications
     # if: github.event_name == 'release' && github.event.action == 'published'
-    continue-on-error: true
+     # Only do this job if publishing a release
     strategy:
-      fail-fast: false
       matrix:
         job:
+          # TODO: Add other targets as needed, using fuel-core as reference
           - os: ubuntu-latest
             platform: linux
             target: x86_64-unknown-linux-gnu
             cross_image: x86_64-linux-gnu
-          # - os: ubuntu-latest
-          #   platform: linux-arm
-          #   target: aarch64-unknown-linux-gnu
-          #   cross_image: aarch64-linux-gnu
-          # - os: macos-latest
-          #   platform: darwin
-          #   target: x86_64-apple-darwin
-          # - os: macos-latest
-          #   platform: darwin-arm
-          #   target: aarch64-apple-darwin
+          - os: macos-latest
+            platform: darwin
+            target: x86_64-apple-darwin
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v3
-        with:
-          images: |
-            ghcr.io/fuellabs/fuel-indexer
-          tags: |
-            type=sha
-            type=ref,event=branch
-            type=ref,event=tag
-            type=semver,pattern={{raw}}
-          flavor: |
-            latest=${{ github.ref == 'refs/heads/master' }}
-            
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
@@ -467,7 +447,6 @@ jobs:
             type=semver,pattern={{raw}}
           flavor: |
             latest=${{ github.ref == 'refs/heads/master' }}
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
@@ -506,7 +485,7 @@ jobs:
     needs:
       [
         cargo-verifications,
-        # cargo-test-workspace-all-features,
+        cargo-test-workspace-all-features,
         mdbook-build,
       ]
     runs-on: ubuntu-latest
@@ -515,7 +494,9 @@ jobs:
 
   notify-slack-on-failure:
     if: ${{ always() }} && github.ref == 'refs/heads/master'
-    needs: validation-complete
+    needs: 
+      - validation-complete
+      - publish-fuel-indexer-binaries
     runs-on: ubuntu-latest
     steps:
       - name: Notify Slack On Failure
@@ -577,6 +558,7 @@ jobs:
     if: github.ref == 'refs/heads/master'
     needs:
       - publish-docker-image
+      - publish-fuel-indexer-binaries
     runs-on: ubuntu-latest
     steps:
       - name: Set Environment Variables
