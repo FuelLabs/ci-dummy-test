@@ -143,7 +143,7 @@ jobs:
         ports:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-    needs: 
+    needs:
       - cancel-previous-runs
       - cargo-toml-fmt-check
       - cargo-build-wasm-example
@@ -255,8 +255,7 @@ jobs:
     needs:
       - cancel-previous-runs
       - cargo-test-workspace-all-features
-      - cargo-verifications
-    # if: github.event_name == 'release' && github.event.action == 'published'
+    if: github.event_name == 'release' && github.event.action == 'published'
      # Only do this job if publishing a release
     strategy:
       matrix:
@@ -418,6 +417,7 @@ jobs:
 
   publish-docker-image:
     needs: cargo-toml-fmt-check
+
     if: always()
     runs-on: ubuntu-latest
     permissions:
@@ -511,7 +511,9 @@ jobs:
 
   publish:
     # Only do this job if publishing a release and validations pass.
-    needs: validation-complete
+    needs: 
+      - validation-complete
+      - publish-fuel-indexer-binaries
     if: github.event_name == 'release' && github.event.action == 'published'
     runs-on: ubuntu-latest
     steps:
