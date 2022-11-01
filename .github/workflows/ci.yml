@@ -131,78 +131,78 @@ jobs:
         env:
           RUSTFLAGS: '-D warnings'
 
-  cargo-verifications:
-    runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:latest
-        env:
-          POSTGRES_PASSWORD: my-secret
-          POSTGRES_DB: postgres
-          POSTGRES_USER: postgres
-        ports:
-          - 5432:5432
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-    needs:
-      - cancel-previous-runs
-      - cargo-toml-fmt-check
-      - cargo-build-wasm-example
-    strategy:
-      matrix:
-        include:
-          - command: fmt
-            args: --all --verbose -- --check
-            env:
-              RUSTFLAGS: '-D warnings'
-          # - command: clippy
-          #   args: --all-features --all-targets
-          #   env:
-          #     RUSTFLAGS: '-D warnings'
-          # - command: check
-          #   args: --locked --workspace --all-features --all-targets
-          #   env:
-          #     RUSTFLAGS: '-D warnings'
-          # - command: build
-          #   args: --locked --workspace --all-features --all-targets
-          #   env:
-          #     RUSTFLAGS: '-D warnings'
-          # - command: test
-          #   args: --locked --workspace
-          #   env:
-          #     RUSTFLAGS: '-D warnings'
-          # - command: test
-          #   args: --locked --all-targets --no-default-features --workspace
-          #   env:
-          #     RUSTFLAGS: '-D warnings'
-    # disallow any job that takes longer than 45 minutes
-    timeout-minutes: 45
-    continue-on-error: ${{ matrix.skip-error || false }}
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-      - run: cargo install sqlx-cli
-      - run: bash scripts/run_migrations.bash
-      - name: ${{ matrix.command }} ${{ matrix.args }}
-        uses: actions-rs/cargo@v1
-        with:
-          command: ${{ matrix.command }}
-          args: ${{ matrix.args }}
-      - name: Notify if Job Fails
-        uses: ravsamhq/notify-slack-action@v1
-        if: always() && github.ref == 'refs/heads/master'
-        with:
-          status: ${{ job.status }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-          notification_title: '{workflow} has {status_message}'
-          message_format: '{emoji} *{workflow}* {status_message} in <{repo_url}|{repo}> : <{run_url}|View Run Results>'
-          footer: ''
-          notify_when: 'failure'
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_NOTIFY_BUILD }}
-          RUSTFLAGS: -D warnings
+  # cargo-verifications:
+  #   runs-on: ubuntu-latest
+  #   services:
+  #     postgres:
+  #       image: postgres:latest
+  #       env:
+  #         POSTGRES_PASSWORD: my-secret
+  #         POSTGRES_DB: postgres
+  #         POSTGRES_USER: postgres
+  #       ports:
+  #         - 5432:5432
+  #       options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+  #   needs:
+  #     - cancel-previous-runs
+  #     - cargo-toml-fmt-check
+  #     - cargo-build-wasm-example
+  #   strategy:
+  #     matrix:
+  #       include:
+  #         - command: fmt
+  #           args: --all --verbose -- --check
+  #           env:
+  #             RUSTFLAGS: '-D warnings'
+  #         # - command: clippy
+  #         #   args: --all-features --all-targets
+  #         #   env:
+  #         #     RUSTFLAGS: '-D warnings'
+  #         # - command: check
+  #         #   args: --locked --workspace --all-features --all-targets
+  #         #   env:
+  #         #     RUSTFLAGS: '-D warnings'
+  #         # - command: build
+  #         #   args: --locked --workspace --all-features --all-targets
+  #         #   env:
+  #         #     RUSTFLAGS: '-D warnings'
+  #         # - command: test
+  #         #   args: --locked --workspace
+  #         #   env:
+  #         #     RUSTFLAGS: '-D warnings'
+  #         # - command: test
+  #         #   args: --locked --all-targets --no-default-features --workspace
+  #         #   env:
+  #         #     RUSTFLAGS: '-D warnings'
+  #   # disallow any job that takes longer than 45 minutes
+  #   timeout-minutes: 45
+  #   continue-on-error: ${{ matrix.skip-error || false }}
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: actions-rs/toolchain@v1
+  #       with:
+  #         profile: minimal
+  #         toolchain: stable
+  #     - run: cargo install sqlx-cli
+  #     - run: bash scripts/run_migrations.bash
+  #     - name: ${{ matrix.command }} ${{ matrix.args }}
+  #       uses: actions-rs/cargo@v1
+  #       with:
+  #         command: ${{ matrix.command }}
+  #         args: ${{ matrix.args }}
+  #     - name: Notify if Job Fails
+  #       uses: ravsamhq/notify-slack-action@v1
+  #       if: always() && github.ref == 'refs/heads/master'
+  #       with:
+  #         status: ${{ job.status }}
+  #         token: ${{ secrets.GITHUB_TOKEN }}
+  #         notification_title: '{workflow} has {status_message}'
+  #         message_format: '{emoji} *{workflow}* {status_message} in <{repo_url}|{repo}> : <{run_url}|View Run Results>'
+  #         footer: ''
+  #         notify_when: 'failure'
+  #       env:
+  #         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_NOTIFY_BUILD }}
+  #         RUSTFLAGS: -D warnings
 
   # NOTE: This can possibly figure out how to put this in cargo-verifications later
   cargo-test-workspace-all-features:
@@ -255,7 +255,7 @@ jobs:
     needs:
       - cancel-previous-runs
       - cargo-test-workspace-all-features
-      - cargo-verifications
+      # - cargo-verifications
     # if: github.event_name == 'release' && github.event.action == 'published'
      # Only do this job if publishing a release
     strategy:
@@ -484,7 +484,7 @@ jobs:
   validation-complete:
     needs:
       [
-        cargo-verifications,
+        # cargo-verifications,
         cargo-test-workspace-all-features,
         mdbook-build,
       ]
