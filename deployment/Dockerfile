@@ -28,7 +28,7 @@ FROM chef AS builder
 ENV CARGO_NET_GIT_FETCH_WITH_CLI=true
 COPY --from=planner /build/recipe.json recipe.json
 
-ENV SQLX_OFFLINE=true
+ENV SQLX_OFFLINE=1
 
 RUN cargo chef cook --release -p fuel-indexer --recipe-path recipe.json
 RUN cargo chef cook --release -p fuel-indexer-api-server --recipe-path recipe.json
