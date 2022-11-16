@@ -250,9 +250,9 @@ crate-type = ['cdylib']
 fuel-indexer-macros = { version = &quot;0.1&quot;, default-features = false }
 fuel-indexer-plugin = &quot;0.1&quot;
 fuel-indexer-schema = { version = &quot;0.1&quot;, default-features = false }
-fuel-tx = &quot;0.18&quot;
-fuels-core = &quot;0.26&quot;
-fuels-types = &quot;0.26&quot;
+fuel-tx = &quot;0.23&quot;
+fuels-core = &quot;0.30&quot;
+fuels-types = &quot;0.30&quot;
 getrandom = { version = &quot;0.2&quot;, features = [&quot;js&quot;] }
 serde = { version = &quot;1.0&quot;, default-features = false, features = [&quot;derive&quot;] }
 serde_json = { version = &quot;1.0&quot;, default-features = false, features = [&quot;alloc&quot;] }
@@ -292,7 +292,7 @@ pub mod my_counter_index_module {
 <span class="boring">}
 </span></code></pre></pre>
 <h3 id="4-compile-the-index"><a class="header" href="#4-compile-the-index">4. Compile the index</a></h3>
-<pre><code class="language-bash">cargo build -p my-index --release --wasm32-unknown-unknown
+<pre><code class="language-bash">cargo build -p my-index --release --target wasm32-unknown-unknown
 </code></pre>
 <blockquote>
 <p>IMPORTANT: As of this writing, there is a small bug in newly built Fuel indexer WASM modules that produces a WASM runtime error due an errant upstream dependency. For now, a quick workaround requires using <code>wasm-snip</code> to remove the errant symbols from the WASM module. More info can be found in the related script <a href="https://github.com/FuelLabs/fuel-indexer/blob/master/scripts/stripper.bash">here</a>.</p>
