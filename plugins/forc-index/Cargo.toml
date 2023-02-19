@@ -1,0 +1,36 @@
+[package]
+name = "forc-index"
+version = "0.3.0"
+edition = "2021"
+license = "BUSL-1.1"
+authors = ["Fuel Labs <contact@fuel.sh>"]
+homepage = "https://fuel.network/"
+repository = "https://github.com/FuelLabs/fuel-indexer"
+description = "Fuel Indexer forc plugin"
+
+[dependencies]
+anyhow = "1"
+clap = { version = "3", features = ["derive", "env"] }
+forc-postgres = { version = "0.3", path = "../forc-postgres" }
+forc-tracing = { version = "0.31", default-features = false }
+forc-util = { version = "0.31" }
+fuel-indexer-lib = { version = "0.3", path = "../../packages/fuel-indexer-lib" }
+fuel-tx = { version = "0.23", features = ["builder"] }
+fuels-types = "0.31"
+hex = "0.4.3"
+hyper-rustls = { version = "0.23", features = ["http2"] }
+indicatif = "0.17"
+reqwest = { version = "0.11", default-features = false, features = ["json", "rustls-tls", "multipart", "blocking"] }
+serde = "1.0"
+serde_json = "1.0.73"
+serde_yaml = "0.8"
+tokio = { version = "1.8", features = ["macros", "rt-multi-thread", "process"] }
+toml = "0.5"
+tracing = "0.1"
+
+[[bin]]
+name = "forc-index"
+path = "src/bin/forc-index.rs"
+
+[lib]
+path = "src/lib.rs"
