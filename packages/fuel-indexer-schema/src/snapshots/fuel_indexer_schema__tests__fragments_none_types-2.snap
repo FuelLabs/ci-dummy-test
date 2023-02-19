@@ -1,6 +1,0 @@
----
-source: packages/fuel-indexer-schema/src/lib.rs
-expression: asset_id_none.query_fragment()
----
-"NULL"
-
